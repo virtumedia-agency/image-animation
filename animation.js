@@ -34,13 +34,14 @@ const pixelizationFadeTime = config.pixelizationFadeTime;
 const pixelSize = config.pixelSize;
 const numPixels = config.numPixels;
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     const imageContainers = document.querySelectorAll('.animate-image');
 
-    imageContainers.forEach(imageContainer => {
+    imageContainers.forEach(async imageContainer => {
         const image = imageContainer.querySelector('img');
         const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
+        canvas.className = image.className; 
+        const context = canvas.getContext('2d', { willReadFrequently: true });
         canvas.className = 'overlay';
         imageContainer.appendChild(canvas);
 
@@ -50,25 +51,30 @@ document.addEventListener("DOMContentLoaded", function() {
         let pixelizationState = null;
         let fadingInProgress = false;
 
-        async function imageToImageBitmap(image) {
-            const bitmap = await createImageBitmap(image);
-            return bitmap;
+        async function loadImage(url) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                return createImageBitmap(blob);
+            } catch (error) {
+                console.error("Error loading image:", error);
+                throw error;
+            }
         }
 
-        async function pixelateArea(x, y) {
+        async function pixelateArea(x, y, imgBitmap) {
             if (fadingInProgress) return;
+            const imageRect = image.getBoundingClientRect();
+            canvas.width = imageRect.width;
+            canvas.height = imageRect.height;
 
-            const imgBitmap = await imageToImageBitmap(image);
-            canvas.width = imageWidth;
-            canvas.height = imageHeight;
             context.clearRect(0, 0, canvas.width, canvas.height);
 
             if (pixelizationState) {
                 context.putImageData(pixelizationState, 0, 0);
             } else {
-                context.drawImage(imgBitmap, 0, 0, imageWidth, imageHeight);
+                context.drawImage(imgBitmap, 0, 0, canvas.width, canvas.height);
             }
-
             for (let i = 0; i < numPixels; i++) {
                 for (let j = 0; j < numPixels; j++) {
                     const pixelX = x - (pixelSize * numPixels) / 2 + i * pixelSize;
@@ -95,7 +101,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     for (let i = 3; i < data.length; i += 4) {
                         if (data[i] > 0) {
                             pixelsLeft = true;
-                            data[i] -= 10; // Zmniejszaj przezroczystość pikseli
+                            data[i] -= 10; // Zmniejszaj przezroczystoĹÄ pikseli
                             fadingInProgress = true;
                         }
                     }
@@ -111,14 +117,31 @@ document.addEventListener("DOMContentLoaded", function() {
             }, pixelizationFadeTime);
         }
 
-        imageContainer.addEventListener('click', async function(event) {
+        // UtwĂłrz adres URL obrazu przy uĹźyciu CORS Anywhere
+        const imageUrl = '' + image.src;
+
+        // Wczytaj obraz
+        const img = new Image();
+        img.crossOrigin = 'Anonymous'; // Ustawienie polityki CORS
+        img.src = imageUrl;
+
+        img.onload = function() {
+            image.src = imageUrl;
+        };
+
+        imageContainer.addEventListener('click', async function (event) {
             if (fadingInProgress) return;
 
             const rect = canvas.getBoundingClientRect();
             const x = event.clientX - rect.left;
             const y = event.clientY - rect.top;
 
-            await pixelateArea(x, y);
+            try {
+                const imgBitmap = await loadImage(image.src);
+                await pixelateArea(x, y, imgBitmap);
+            } catch (error) {
+                console.error("Error:", error);
+            }
         });
     });
 });
