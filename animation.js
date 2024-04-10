@@ -6,7 +6,7 @@ const desktopConfig = {
     pixelizationFadeTime: 1500,
     pixelSize: 20,
     numPixels: 5
-};
+}; 
 
 const mobileConfig = {
     pixelizationFadeTime: 1000,
