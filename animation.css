@@ -10,10 +10,11 @@
 }
 
 .section-photo_img {
-width: unset;
+object-fit: cover;
+width: 100%;
+height: auto;
+max-height: max-content;
+max-width: max-content;
 }
 
-.section-image{
-    width: unset;
-}
 /* END Animate images*/
