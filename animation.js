@@ -6,7 +6,7 @@ const desktopConfig = {
     pixelizationFadeTime: 1500,
     pixelSize: 20,
     numPixels: 5
-}; 
+};
 
 const mobileConfig = {
     pixelizationFadeTime: 1000,
@@ -45,6 +45,9 @@ document.addEventListener("DOMContentLoaded", function () {
         canvas.className = 'overlay';
         imageContainer.appendChild(canvas);
 
+        const imageWidth = image.width;
+        const imageHeight = image.height;
+
         let pixelizationState = null;
         let fadingInProgress = false;
 
@@ -59,14 +62,11 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        async function pixelateArea(event, imgBitmap) {
+        async function pixelateArea(x, y, imgBitmap) {
             if (fadingInProgress) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-
-            canvas.width = rect.width;
-            canvas.height = rect.height;
+            const imageRect = image.getBoundingClientRect();
+            canvas.width = imageRect.width;
+            canvas.height = imageRect.height;
 
             context.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -129,12 +129,16 @@ document.addEventListener("DOMContentLoaded", function () {
             image.src = imageUrl;
         };
 
-       imageContainer.addEventListener('click', async function (event) {
+        imageContainer.addEventListener('click', async function (event) {
             if (fadingInProgress) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
 
             try {
                 const imgBitmap = await loadImage(image.src);
-                await pixelateArea(event, imgBitmap);
+                await pixelateArea(x, y, imgBitmap);
             } catch (error) {
                 console.error("Error:", error);
             }
