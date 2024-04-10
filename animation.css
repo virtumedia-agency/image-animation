@@ -8,6 +8,13 @@
     top: 0;
     left: 0;
 }
+.animate-image img {
+    object-fit: cover;
+    width: 100%;
+    height: auto;
+    max-height: max-content;
+    max-width: max-content;
+}
 
 .section-photo_img {
 object-fit: cover;
