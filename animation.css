@@ -12,4 +12,8 @@
 .section-photo_img {
 width: unset;
 }
+
+.section-image{
+    width: unset;
+}
 /* END Animate images*/
