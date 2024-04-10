@@ -8,4 +8,8 @@
     top: 0;
     left: 0;
 }
+
+.section-photo_img {
+width: unset;
+}
 /* END Animate images*/
