@@ -12,8 +12,6 @@
     object-fit: cover;
     width: 100%;
     height: auto;
-    max-height: max-content;
-    max-width: max-content;
 }
 
 .section-photo_img {
