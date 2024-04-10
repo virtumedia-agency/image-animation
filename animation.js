@@ -45,9 +45,6 @@ document.addEventListener("DOMContentLoaded", function () {
         canvas.className = 'overlay';
         imageContainer.appendChild(canvas);
 
-        const imageWidth = image.width;
-        const imageHeight = image.height;
-
         let pixelizationState = null;
         let fadingInProgress = false;
 
@@ -62,11 +59,14 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        async function pixelateArea(x, y, imgBitmap) {
+        async function pixelateArea(event, imgBitmap) {
             if (fadingInProgress) return;
-            const imageRect = image.getBoundingClientRect();
-            canvas.width = imageRect.width;
-            canvas.height = imageRect.height;
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            canvas.width = rect.width;
+            canvas.height = rect.height;
 
             context.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -129,16 +129,12 @@ document.addEventListener("DOMContentLoaded", function () {
             image.src = imageUrl;
         };
 
-        imageContainer.addEventListener('click', async function (event) {
+       imageContainer.addEventListener('click', async function (event) {
             if (fadingInProgress) return;
-
-            const rect = canvas.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
 
             try {
                 const imgBitmap = await loadImage(image.src);
-                await pixelateArea(x, y, imgBitmap);
+                await pixelateArea(event, imgBitmap);
             } catch (error) {
                 console.error("Error:", error);
             }
