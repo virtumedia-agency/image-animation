@@ -1,12 +1,6 @@
 /*Animate images*/
 .animate-image {
     position: relative;
- 
-
-}
-
-.right-image-sm_wrp{
-   overflow: hidden;
 }
 .overlay {
     position: absolute;
