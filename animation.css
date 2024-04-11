@@ -1,6 +1,7 @@
 /*Animate images*/
 .animate-image {
     position: relative;
+    overflow: hidden;
 
 }
 .overlay {
